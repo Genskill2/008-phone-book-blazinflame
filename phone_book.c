@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
     list(fp);
     fclose(fp);
     exit(0);
-  } else if (strcmp(argv[1], "search") == 0) {  
+  } else if (strcmp(argv[1], "search") == 0) {  /* Handle search */
     if (argc != 3) {
       print_usage("Improper arguments for search", argv[0]);
       exit(1);
@@ -105,12 +105,12 @@ FILE *open_db_file() {
 }
   
 void free_entries(entry *p) {
- free(p);
+  free(p);
   while(p->next!=NULL)
   {
     free(p->next);
     p=p->next;
-  }   
+  }  
 }
 
 void print_usage(char *message, char *progname) {
@@ -147,23 +147,24 @@ entry *load_entries(FILE *fp) {
   entry *tmp = NULL;
   /* Description of %20[^,\n]
      % is the start of the specifier (like %s, %i etc.)
-
+     
      20 is the maximum number of characters that this will take. We
         know that names and phone numbers will be 20 bytes maximum so
         we limit it to that. %20s will read in 20 character strings
         (including the , to separate the name and phone number. That's
         why we use
-
+        
     [^,\n] Square brackets are used to indicate a set of allowed
            characters [abc] means only a, b, or c. With the ^, it's
            used to specify a set of disallowed characters. So [^abc]
            means any character *except* a, b, or c. [^,] means any
            character except a , [^,\n] means any character except a
            comma(,) or a newline(\n).
-
+           
     %20[^,\n] will match a string of characters with a maximum length
      of 20 characters that doesn't have a comma(,) or a newline(\n).
   */        
+  
   while (fscanf(fp, "%20[^,\n],%20[^,\n]\n", name, phone) != EOF) {
     tmp = create_entry_node(name, phone);
     if (ret == NULL)
@@ -194,13 +195,14 @@ void add(char *name, char *phone) {
 void list(FILE *db_file) {
   entry *p = load_entries(db_file);
   entry *base = p;
-  int counting=0;
+  int count=0;
   while (p!=NULL) {
     printf("%-20s : %10s\n", p->name, p->phone);
     p=p->next;
-    counting++;
+    count++;
   }
-  printf("Total number of entries :  %d\n",count);
+  printf("Total entries :  %d\n",count);
+  
   free_entries(base);
 }
 
@@ -238,9 +240,10 @@ int delete(FILE *db_file, char *name) {
           free(del);
           deleted=1;
         }
-          prev=p;
-          p=p->next;
     }
+    prev=p;
+    p=p->next;
+  }
   write_all_entries(base);
   free_entries(base);
   return deleted;
